@@ -3,11 +3,23 @@ def split_code(code):
     checksum = code[square_bracket + 1:-1]
     rest = code[:square_bracket]
     sections = rest.split('-')
-    sector_id = sections[-1]
+    sector_id = int(sections[-1])
     letters = sections[0:-1]
     
     return {'name': letters, 'id': sector_id, 'checksum': checksum}
 
+def decode_name(code):
+    x = split_code(code)
+    chars = [[ord(l) - 97 for l in let] for let in x['name']]
+    chars = [[(c + x['id']) % 26 for c in section] for section in chars]
+    chars = [''.join([chr(c + 97) for c in section]) for section in chars]
+
+    return ' '.join(chars)
+    
+def part2_map(code):
+    x = split_code(code)
+    return (decode_name(code),x['id'])
+    
 def dict_to_tuple_list(d):
     return [(k,d[k]) for k in d.keys()]
     
@@ -39,7 +51,7 @@ def read_input(filename):
         
 def get_sector(code):
     x = split_code(code)
-    return int(x['id'])
+    return x['id']
         
 if __name__ == '__main__':
     input = read_input('day4')
@@ -50,3 +62,9 @@ if __name__ == '__main__':
     
     x = [get_sector(code) for code in input if validate(code)]
     print sum(x)
+    
+    print decode_name('qzmt-zixmtkozy-ivhz-343[whate]')
+    
+    for name,id in map(part2_map,input):
+        if 'north' in name:
+            print '{} : {}'.format(name,id)
